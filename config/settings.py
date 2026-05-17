@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,14 +21,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ncecft^h83ku685^^8^&we%iwl&9y#p15q9)@ay41b@drnjczl'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
+SECRET_KEY = os.environ.get('SECRET_KEY', 'fallback-secret-key')
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 
 # Application definition
 
@@ -78,12 +75,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-        'USER': 'lottouser',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME':     os.environ.get('POSTGRES_DB',       'lottodb'),
+        'USER':     os.environ.get('POSTGRES_USER',     'lottouser'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'password'),
+        'HOST':     os.environ.get('POSTGRES_HOST',     'db'),
+        'PORT':     os.environ.get('POSTGRES_PORT',     '5432'),
     }
 }
 
