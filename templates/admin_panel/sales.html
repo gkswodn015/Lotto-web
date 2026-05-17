@@ -1,0 +1,41 @@
+<!-- templates/admin_panel/sales.html -->
+{% extends 'base.html' %}
+{% block title %}판매 내역{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">📋 판매 내역</h2>
+
+<!-- 회차 필터 -->
+<form method="get" class="d-flex gap-2 mb-4">
+  <select name="round" class="form-select w-auto">
+    <option value="">전체 회차</option>
+    {% for r in rounds %}
+      <option value="{{ r.round_number }}" {% if selected == r.round_number|stringformat:"s" %}selected{% endif %}>
+        {{ r.round_number }}회차
+      </option>
+    {% endfor %}
+  </select>
+  <button class="btn btn-outline-primary">조회</button>
+</form>
+
+<table class="table table-hover">
+  <thead class="table-dark">
+    <tr>
+      <th>회차</th><th>구매자</th><th>번호</th><th>종류</th><th>구매시각</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in tickets %}
+    <tr>
+      <td>{{ t.round.round_number }}</td>
+      <td>{{ t.user.username }}</td>
+      <td>{{ t.numbers|join:", " }}</td>
+      <td>{% if t.is_auto %}<span class="badge bg-info">자동</span>{% else %}<span class="badge bg-secondary">수동</span>{% endif %}</td>
+      <td>{{ t.purchased_at|date:"Y-m-d H:i" }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5" class="text-center text-muted">판매 내역이 없습니다.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

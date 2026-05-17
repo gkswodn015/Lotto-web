@@ -1,0 +1,73 @@
+<!-- templates/lottery/buy.html -->
+{% extends 'base.html' %}
+{% block title %}복권 구매{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h2 class="mb-1">🎟 {{ round.round_number }}회차 복권 구매</h2>
+    <p class="text-muted mb-4">1~45 중 6개를 선택하거나 자동 번호를 이용하세요.</p>
+
+    <!-- 모드 선택 버튼 -->
+    <div class="btn-group mb-4">
+      <button type="button" class="btn btn-primary"         onclick="setMode('manual')" id="btn-manual">✏️ 수동 선택</button>
+      <button type="button" class="btn btn-outline-primary" onclick="setMode('auto')"   id="btn-auto">🎲 자동 선택</button>
+    </div>
+
+    <form method="post" id="lotto-form">
+      {% csrf_token %}
+      <input type="hidden" name="mode" id="mode-input" value="manual">
+
+      <!-- 수동 선택 영역 -->
+      <div id="manual-section">
+        <p class="mb-2 fw-semibold">번호를 6개 선택하세요
+          <span id="count-badge" class="badge bg-secondary ms-2">0 / 6</span>
+        </p>
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          {% for n in number_range %}
+            <input type="checkbox" class="btn-check" name="number"
+                   value="{{ n }}" id="num{{ n }}"
+                   onchange="updateCount()">
+            <label class="btn btn-outline-warning fw-bold"
+                   style="width:48px;height:48px;padding:0;line-height:46px;border-radius:50%;"
+                   for="num{{ n }}">{{ n }}</label>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- 자동 선택 영역 -->
+      <div id="auto-section" style="display:none">
+        <div class="alert alert-info">
+          🎲 버튼을 누르면 컴퓨터가 1~45 중 6개를 랜덤으로 선택합니다.
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-success btn-lg px-5">구매하기</button>
+    </form>
+  </div>
+</div>
+
+<script>
+function setMode(mode) {
+  document.getElementById('mode-input').value = mode;
+  const isManual = mode === 'manual';
+  document.getElementById('manual-section').style.display = isManual ? '' : 'none';
+  document.getElementById('auto-section').style.display   = isManual ? 'none' : '';
+  document.getElementById('btn-manual').className = 'btn ' + (isManual ? 'btn-primary' : 'btn-outline-primary');
+  document.getElementById('btn-auto').className   = 'btn ' + (isManual ? 'btn-outline-primary' : 'btn-primary');
+}
+
+function updateCount() {
+  const checked = document.querySelectorAll('input[name=number]:checked');
+  document.getElementById('count-badge').textContent = checked.length + ' / 6';
+  // 6개 초과 선택 방지
+  if (checked.length >= 6) {
+    document.querySelectorAll('input[name=number]:not(:checked)')
+      .forEach(cb => cb.disabled = true);
+  } else {
+    document.querySelectorAll('input[name=number]')
+      .forEach(cb => cb.disabled = false);
+  }
+}
+</script>
+{% endblock %}

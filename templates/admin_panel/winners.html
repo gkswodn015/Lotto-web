@@ -1,0 +1,32 @@
+<!-- templates/admin_panel/draw.html -->
+{% extends 'base.html' %}
+{% block title %}추첨{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">🎰 추첨 실행</h2>
+
+{% if pending_rounds %}
+  {% for r in pending_rounds %}
+  <div class="card mb-3">
+    <div class="card-body d-flex justify-content-between align-items-center">
+      <div>
+        <h5 class="mb-0">{{ r.round_number }}회차</h5>
+        <small class="text-muted">
+          티켓 수: {{ r.ticket_set.count }}장
+        </small>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="round_id" value="{{ r.pk }}">
+        <button type="submit" class="btn btn-danger"
+                onclick="return confirm('{{ r.round_number }}회차 추첨을 실행할까요?')">
+          추첨 실행
+        </button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <div class="alert alert-secondary">추첨 대기 중인 회차가 없습니다.</div>
+{% endif %}
+{% endblock %}

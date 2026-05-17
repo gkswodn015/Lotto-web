@@ -1,0 +1,47 @@
+<!-- templates/lottery/my_tickets.html -->
+{% extends 'base.html' %}
+{% block title %}내 티켓{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">🎫 내 복권 목록</h2>
+
+{% for ticket in tickets %}
+<div class="card mb-3 shadow-sm">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h5 class="mb-0">{{ ticket.round.round_number }}회차</h5>
+      <small class="text-muted">{{ ticket.purchased_at|date:"Y-m-d H:i" }}</small>
+    </div>
+
+    <!-- 번호 볼 -->
+    <div class="d-flex gap-2 mb-2">
+      {% for n in ticket.numbers %}
+        <span class="badge rounded-circle bg-warning text-dark fw-bold d-flex align-items-center justify-content-center"
+              style="width:38px;height:38px;font-size:14px;">{{ n }}</span>
+      {% endfor %}
+      {% if ticket.is_auto %}
+        <span class="badge bg-secondary align-self-center">자동</span>
+      {% endif %}
+    </div>
+
+    <!-- 당첨 결과 -->
+    {% if ticket.round.is_drawn %}
+      {% if ticket.prize %}
+        <span class="badge bg-danger fs-6">🎉 {{ ticket.prize.get_rank_display }} 당첨!</span>
+        <span class="ms-2 fw-semibold">{{ ticket.prize.prize_amount|floatformat:0 }}원</span>
+      {% else %}
+        <span class="text-muted">😢 낙첨</span>
+      {% endif %}
+    {% else %}
+      <span class="badge bg-secondary">추첨 전</span>
+    {% endif %}
+  </div>
+</div>
+
+{% empty %}
+<div class="text-center py-5">
+  <p class="text-muted mb-3">구매한 복권이 없습니다.</p>
+  <a href="{% url 'lottery:buy' %}" class="btn btn-primary">지금 구매하기</a>
+</div>
+{% endfor %}
+{% endblock %}
